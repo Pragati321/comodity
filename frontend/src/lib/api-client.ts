@@ -75,7 +75,7 @@ class APIClient {
   }
 }
 
-const apiClient = new APIClient(process.env.NEXT_PUBLIC_API_URL || '');
+const apiClient = new APIClient(process.env.NEXT_PUBLIC_API_URL || 'https://commodity-backend-694682127859.asia-south2.run.app');
 
 export default apiClient;
 export type { RequestConfig };

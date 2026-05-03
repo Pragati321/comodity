@@ -15,7 +15,7 @@ export function SyncButton() {
     setCurrentAgent("Starting...");
 
     try {
-      const res = await fetch("http://127.0.0.1:8001/api/pipeline/trigger", {
+      const res = await fetch("https://commodity-backend-694682127859.asia-south2.run.app/api/pipeline/trigger", {
         method: "POST",
       });
       
@@ -31,7 +31,7 @@ export function SyncButton() {
         await new Promise(resolve => setTimeout(resolve, 3000));
         
         try {
-          const statusRes = await fetch("http://127.0.0.1:8001/api/pipeline/status");
+          const statusRes = await fetch("https://commodity-backend-694682127859.asia-south2.run.app/api/pipeline/status");
           if (statusRes.ok) {
             const data = await statusRes.json();
             setCurrentAgent(data.current_agent || "Processing...");

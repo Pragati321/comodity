@@ -19,7 +19,7 @@ import { PrintButton } from "@/components/PrintButton";
 
 async function getCommodityDetail(slug: string): Promise<CommodityDetail> {
   try {
-    const res = await fetch(`http://127.0.0.1:8001/api/commodity/${slug}`, {
+    const res = await fetch(`https://commodity-backend-694682127859.asia-south2.run.app/api/commodity/${slug}`, {
       cache: 'no-store'
     });
     if (!res.ok) throw new Error("Failed to fetch commodity data");

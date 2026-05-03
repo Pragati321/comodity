@@ -13,7 +13,7 @@ export function CommodityManagement() {
 
   const fetchCommodities = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8001/api/management/commodities');
+      const response = await fetch('https://commodity-backend-694682127859.asia-south2.run.app/api/management/commodities');
       if (!response.ok) throw new Error('Failed to fetch');
       const data = await response.json();
       return data;
@@ -43,7 +43,7 @@ export function CommodityManagement() {
 
   const handleSave = async () => {
     try {
-      const response = await fetch('http://localhost:8001/api/management/commodities', {
+      const response = await fetch('https://commodity-backend-694682127859.asia-south2.run.app/api/management/commodities', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editForm),
@@ -62,7 +62,7 @@ export function CommodityManagement() {
   const handleDelete = async (slug: string) => {
     if (!confirm(`Are you sure you want to delete ${slug}? This will remove all history and analysis.`)) return;
     try {
-      const response = await fetch(`http://localhost:8001/api/management/commodities/${slug}`, {
+      const response = await fetch(`https://commodity-backend-694682127859.asia-south2.run.app/api/management/commodities/${slug}`, {
         method: 'DELETE',
       });
       if (response.ok) {

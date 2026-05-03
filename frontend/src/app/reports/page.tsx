@@ -29,7 +29,7 @@ export default function ReportsPage() {
     
     try {
       // 1. Fetch the main dashboard data to get the list of commodities and global intelligence
-      const dashRes = await fetch("http://127.0.0.1:8001/api/dashboard", { cache: 'no-store' });
+      const dashRes = await fetch("https://commodity-backend-694682127859.asia-south2.run.app/api/dashboard", { cache: 'no-store' });
       if (!dashRes.ok) throw new Error("Failed to fetch dashboard data");
       const dashData = await dashRes.json();
 
@@ -37,7 +37,7 @@ export default function ReportsPage() {
       const commodityDetails = await Promise.all(
         dashData.commodities.map(async (c: any) => {
           try {
-            const detRes = await fetch(`http://127.0.0.1:8001/api/commodity/${c.slug}`, { cache: 'no-store' });
+            const detRes = await fetch(`https://commodity-backend-694682127859.asia-south2.run.app/api/commodity/${c.slug}`, { cache: 'no-store' });
             if (detRes.ok) return await detRes.json();
           } catch (e) {
             console.error(`Failed to fetch details for ${c.slug}`, e);
@@ -283,7 +283,7 @@ export default function ReportsPage() {
       console.log("Real multi-commodity report generated successfully.");
     } catch (err) {
       console.error("Export failed:", err);
-      alert("Failed to generate report. Please ensure the backend is running at http://127.0.0.1:8001");
+      alert("Failed to generate report. Please ensure the backend is running at https://commodity-backend-694682127859.asia-south2.run.app");
     } finally {
       setDownloadingId(null);
     }

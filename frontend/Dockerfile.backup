@@ -1,0 +1,16 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+ENV NEXT_PUBLIC_API_URL=https://commodity-backend-694682127859.asia-south2.run.app
+RUN npm run build
+
+ENV PORT=8080
+EXPOSE 8080
+
+CMD ["npm", "start"]
