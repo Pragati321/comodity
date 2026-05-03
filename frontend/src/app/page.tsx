@@ -1,97 +1,106 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { DashboardData } from "@/lib/types";
 import { CommodityGrid } from "@/components/CommodityGrid";
 import { IntelligenceFeed } from "@/components/IntelligenceFeed";
 import { ExecutiveSummary } from "@/components/ExecutiveSummary";
 import { SyncButton } from "@/components/SyncButton";
 import { Clock } from "lucide-react";
+import apiClient from "@/lib/api-client";
 
-async function getDashboardData(): Promise<DashboardData> {
-  try {
-    const res = await fetch("http://127.0.0.1:8001/api/dashboard", { 
-      cache: 'no-store',
-      next: { revalidate: 0 }
-    });
-    if (!res.ok) {
-      console.warn(`Backend responded with status: ${res.status}`);
-      throw new Error("Failed to fetch dashboard data");
+const MOCK_DATA: DashboardData = {
+  commodities: [
+    {
+      slug: "silicon-dioxide",
+      name: "Silicon Dioxide (Silica)",
+      current_price: 285.50,
+      price_unit: "USD/ton",
+      price_change_pct: 1.2,
+      trend: "up",
+      highlight: "Rising demand from 5G expansion offset by stable supply in China.",
+      sparkline: [270, 275, 272, 280, 282, 284, 285.5],
+      health_index: 85,
+    },
+    {
+      slug: "germanium-dioxide",
+      name: "Germanium Dioxide",
+      current_price: 1850.00,
+      price_unit: "USD/kg",
+      price_change_pct: -0.8,
+      trend: "down",
+      highlight: "China export controls easing slightly leading to improved spot availability.",
+      sparkline: [1900, 1880, 1890, 1870, 1860, 1865, 1850],
+      health_index: 72,
+    },
+    {
+      slug: "helium",
+      name: "Liquid Helium",
+      current_price: 4.85,
+      price_unit: "USD/m3",
+      price_change_pct: 5.4,
+      trend: "up",
+      highlight: "Planned maintenance at major Qatar plant causing temporary supply tightness.",
+      sparkline: [4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.85],
+      health_index: 64,
+    },
+  ],
+  executive_summary: "The optical fibre raw materials market is experiencing a period of localized volatility. Silicon dioxide remains under upward pressure due to infrastructure rollouts, while germanium has stabilized following recent policy shifts. Helium supply remains a critical watchpoint for Q3. We recommend accelerating silicon procurement and maintaining strategic reserves of germanium.",
+  intelligence_feed: [
+    {
+      id: "evt-001",
+      timestamp: new Date().toISOString(),
+      title: "New silica processing plant announced in Vietnam",
+      summary: "A $150M facility is expected to add 200,000 tons of high-purity silica to the global market by late 2027.",
+      classification: "opportunity",
+      source: "Nikkei Asia",
+      source_url: "https://asia.nikkei.com/Business/Materials/Silica-processing-hub-Vietnam",
+      related_commodities: ["silicon-dioxide"],
+    },
+    {
+      id: "evt-002",
+      timestamp: new Date(Date.now() - 3600000).toISOString(),
+      title: "Logistics strike at Port of Antwerp affects chemical shipments",
+      summary: "Potential delays for UV-acrylate and polymer imports into European manufacturing sites.",
+      classification: "risk",
+      source: "Bloomberg",
+      source_url: "https://www.bloomberg.com/news/articles/2026-05-01/port-strikes-global-supply-chains",
+      related_commodities: ["polyethylene"],
+    },
+  ],
+  last_updated: new Date().toISOString(),
+};
+
+export default function DashboardPage() {
+  const [data, setData] = useState<DashboardData>(MOCK_DATA);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchDashboard() {
+      try {
+        setLoading(true);
+        const dashboardData = await apiClient.get("/api/dashboard");
+        setData(dashboardData);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to fetch dashboard data:", err);
+        setError("Using fallback data - backend unavailable");
+        // Keep using MOCK_DATA
+      } finally {
+        setLoading(false);
+      }
     }
-    return await res.json();
-  } catch (error) {
-    console.error("Backend fetch failed, using mock data", error);
-    // Return mock data for development
-    return {
-      commodities: [
-        {
-          slug: "silicon-dioxide",
-          name: "Silicon Dioxide (Silica)",
-          current_price: 285.50,
-          price_unit: "USD/ton",
-          price_change_pct: 1.2,
-          trend: "up",
-          highlight: "Rising demand from 5G expansion offset by stable supply in China.",
-          sparkline: [270, 275, 272, 280, 282, 284, 285.5],
-          health_index: 85,
-        },
-        {
-          slug: "germanium-dioxide",
-          name: "Germanium Dioxide",
-          current_price: 1850.00,
-          price_unit: "USD/kg",
-          price_change_pct: -0.8,
-          trend: "down",
-          highlight: "China export controls easing slightly leading to improved spot availability.",
-          sparkline: [1900, 1880, 1890, 1870, 1860, 1865, 1850],
-          health_index: 72,
-        },
-        {
-          slug: "helium",
-          name: "Liquid Helium",
-          current_price: 4.85,
-          price_unit: "USD/m3",
-          price_change_pct: 5.4,
-          trend: "up",
-          highlight: "Planned maintenance at major Qatar plant causing temporary supply tightness.",
-          sparkline: [4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.85],
-          health_index: 64,
-        },
-      ],
-      executive_summary: "The optical fibre raw materials market is experiencing a period of localized volatility. Silicon dioxide remains under upward pressure due to infrastructure rollouts, while germanium has stabilized following recent policy shifts. Helium supply remains a critical watchpoint for Q3. We recommend accelerating silicon procurement and maintaining strategic reserves of germanium.",
-      intelligence_feed: [
-        {
-          id: "evt-001",
-          timestamp: new Date().toISOString(),
-          title: "New silica processing plant announced in Vietnam",
-          summary: "A $150M facility is expected to add 200,000 tons of high-purity silica to the global market by late 2027.",
-          classification: "opportunity",
-          source: "Nikkei Asia",
-          source_url: "https://asia.nikkei.com/Business/Materials/Silica-processing-hub-Vietnam",
-          related_commodities: ["silicon-dioxide"],
-        },
-        {
-          id: "evt-002",
-          timestamp: new Date(Date.now() - 3600000).toISOString(),
-          title: "Logistics strike at Port of Antwerp affects chemical shipments",
-          summary: "Potential delays for UV-acrylate and polymer imports into European manufacturing sites.",
-          classification: "risk",
-          source: "Bloomberg",
-          source_url: "https://www.bloomberg.com/news/articles/2026-05-01/port-strikes-global-supply-chains",
-          related_commodities: ["polyethylene"],
-        },
-      ],
-      last_updated: "2026-05-01T12:00:00Z",
-    };
-  }
-}
 
-export default async function DashboardPage() {
-  const data = await getDashboardData();
+    fetchDashboard();
+  }, []);
 
   if (!data || !data.commodities) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-mesh text-foreground">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4">Error Loading Intelligence</h2>
-          <p className="text-muted-foreground">Unable to retrieve strategic market data. Please verify backend connectivity.</p>
+          <p className="text-muted-foreground">Unable to retrieve strategic market data.</p>
         </div>
       </div>
     );
@@ -105,7 +114,9 @@ export default async function DashboardPage() {
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-primary/80">
               <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Live Intelligence</span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em]">
+                {loading ? "Loading..." : error ? "Fallback Mode" : "Live Intelligence"}
+              </span>
             </div>
             <h1 className="text-2xl font-extrabold tracking-tight md:text-4xl bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent flex items-center gap-3 italic uppercase">
               STL&nbsp;<span className="text-primary not-italic">COMIQ</span> Dashboard
@@ -122,6 +133,12 @@ export default async function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {error && (
+          <div className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-sm text-yellow-600">
+            ⚠️ {error}
+          </div>
+        )}
 
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
           {/* Main Content: Summary & Commodities */}
@@ -142,8 +159,6 @@ export default async function DashboardPage() {
 
           {/* Sidebar: Intelligence Feed */}
           <div className="space-y-8">
-
-
             <div>
               <h3 className="mb-6 px-2 text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground/60 flex items-center justify-between">
                 <span>Global Intelligence</span>
