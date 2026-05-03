@@ -81,7 +81,7 @@ export default function DashboardPage() {
       try {
         setLoading(true);
         const dashboardData = await apiClient.get("/api/dashboard");
-        setData(dashboardData);
+        setData(dashboardData as DashboardData);
         setError(null);
       } catch (err) {
         console.error("Failed to fetch dashboard data:", err);
